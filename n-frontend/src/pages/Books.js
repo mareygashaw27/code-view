@@ -410,12 +410,12 @@ export default function Books({ lang, setLang }) {
                 <thead className="bg-slate-50/50 border-b border-slate-100">
                   <tr>
                     {isLibrarian && <th className="px-8 py-6 w-12"><input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" checked={filtered.length > 0 && filtered.every(b => selected.includes(b.id))} onChange={() => toggleAll(filtered)} /></th>}
-                    <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">{T.title_col}</th>
-                    <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">{T.author}</th>
-                    <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">{T.category}</th>
-                    <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">{T.totalCopies}</th>
-                    <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">{T.status}</th>
-                    <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Action</th>
+                    <th className="px-8 py-6 text-xs font-extrabold text-slate-800 uppercase tracking-widest">{T.title_col}</th>
+                    <th className="px-8 py-6 text-xs font-extrabold text-slate-800 uppercase tracking-widest">{T.author}</th>
+                    <th className="px-8 py-6 text-xs font-extrabold text-slate-800 uppercase tracking-widest">{T.category}</th>
+                    <th className="px-8 py-6 text-xs font-extrabold text-slate-800 uppercase tracking-widest">{T.totalCopies}</th>
+                    <th className="px-8 py-6 text-xs font-extrabold text-slate-800 uppercase tracking-widest">{T.status}</th>
+                    <th className="px-8 py-6 text-xs font-extrabold text-slate-800 uppercase tracking-widest text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -457,13 +457,25 @@ export default function Books({ lang, setLang }) {
                       </td>
                       <td className="px-8 py-6 text-right">
                          <div className="flex items-center justify-end gap-3">
-                           {b.status === 'borrowed' && isStudent && (
-                             <button onClick={(e) => { e.stopPropagation(); reserveBook(b.id); }} className="btn-premium btn-primary-premium !py-2 !px-5 !text-[10px] !rounded-2xl shadow-lg shadow-primary/20">⏳ {T.reserveBtn}</button>
+                           {isStudent && (
+                             <button 
+                               onClick={(e) => { e.stopPropagation(); reserveBook(b.id); }} 
+                               className="btn-premium btn-primary-premium !py-2.5 !px-6 !text-[10px] !rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+                             >
+                               ⏳ {T.reserveBtn}
+                             </button>
                            )}
-                           {b.status === 'borrowed' && isGuest && (
-                             <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">{T.loginToReserve}</span>
+                           {isGuest && (
+                             <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+                               {T.loginToReserve}
+                             </span>
                            )}
-                           <button onClick={(e) => { e.stopPropagation(); navigate(`/books/${b.id}`); }} className="btn-premium btn-secondary-premium !py-2 !px-5 !text-[10px] !rounded-2xl">✨ {T.details}</button>
+                           <button 
+                             onClick={(e) => { e.stopPropagation(); navigate(`/books/${b.id}`); }} 
+                             className="btn-premium btn-secondary-premium !py-2.5 !px-6 !text-[10px] !rounded-2xl hover:bg-slate-200 transition-colors"
+                           >
+                             ✨ {T.details}
+                           </button>
                          </div>
                       </td>
                     </tr>

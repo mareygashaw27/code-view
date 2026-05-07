@@ -242,21 +242,15 @@ export default function Dashboard({ lang }) {
 
   return (
     <div className="animate-in fade-in duration-1000 space-y-10 pb-20">
-      {/* Header with Welcome and Actions */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-        <div>
-          <h4 className="text-sm font-bold text-primary uppercase tracking-[0.2em] mb-2">{T.welcome}</h4>
-          <h1 className="text-5xl font-outfit font-extrabold text-slate-900 tracking-tight leading-tight">{user.name}</h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => navigate('/reports')} 
-            className="group flex items-center gap-3 px-8 h-14 rounded-full bg-gradient-to-r from-primary to-blue-600 text-white font-bold text-sm shadow-2xl shadow-primary/40 hover:scale-105 hover:shadow-primary/50 transition-all duration-300 active:scale-95"
-          >
-            <span className="text-xl group-hover:rotate-12 transition-transform duration-300">📊</span>
-            <span>{T.quickReport}</span>
-          </button>
-        </div>
+      {/* Quick Report Button */}
+      <div className="flex justify-end mb-4">
+        <button 
+          onClick={() => navigate('/reports')} 
+          className="group flex items-center gap-3 px-8 h-14 rounded-full bg-gradient-to-r from-primary to-blue-600 text-white font-bold text-sm shadow-2xl shadow-primary/40 hover:scale-105 hover:shadow-primary/50 transition-all duration-300 active:scale-95"
+        >
+          <span className="text-xl group-hover:rotate-12 transition-transform duration-300">📊</span>
+          <span>{T.quickReport}</span>
+        </button>
       </div>
 
       {/* Primary Metrics Grid */}
@@ -351,10 +345,10 @@ export default function Dashboard({ lang }) {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-50">
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{T.book}</th>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{isAdminView ? T.student : T.status}</th>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{T.dueDate}</th>
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">{T.status}</th>
+                  <th className="px-8 py-5 text-xs font-extrabold text-slate-800 uppercase tracking-widest">{T.book}</th>
+                  <th className="px-8 py-5 text-xs font-extrabold text-slate-800 uppercase tracking-widest">{isAdminView ? T.student : T.status}</th>
+                  <th className="px-8 py-5 text-xs font-extrabold text-slate-800 uppercase tracking-widest">{T.dueDate}</th>
+                  <th className="px-8 py-5 text-xs font-extrabold text-slate-800 uppercase tracking-widest text-right">{T.status}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50/50">

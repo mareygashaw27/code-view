@@ -31,11 +31,11 @@ router.post('/login', async (req, res) => {
     if (!match) return res.status(400).json({ message: 'Invalid credentials' });
 
     const token = jwt.sign(
-      { id: user._id, name: user.name, username: user.username, role: user.role },
+      { id: user._id, name: user.name, username: user.username, role: user.role, profilePic: user.profilePic },
       process.env.JWT_SECRET,
       { expiresIn: '8h' }
     );
-    res.json({ token, user: { id: user._id, name: user.name, username: user.username, role: user.role } });
+    res.json({ token, user: { id: user._id, name: user.name, username: user.username, role: user.role, profilePic: user.profilePic } });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -113,6 +113,29 @@ router.post('/reset-password/:token', async (req, res) => {
     res.json({ message: 'Password reset successful. You can now login.' });
   } catch (err) {
     res.status(500).json({ message: 'Error resetting password' });
+  }
+});
+
+// PUT /api/auth/profile
+router.put('/profile', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ message: 'Unauthorized' });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { profilePic } = req.body;
+    const user = await User.findById(decoded.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    user.profilePic = profilePic;
+    await user.save();
+    
+    const newToken = jwt.sign(
+      { id: user._id, name: user.name, username: user.username, role: user.role, profilePic: user.profilePic },
+      process.env.JWT_SECRET,
+      { expiresIn: '8h' }
+    );
+    res.json({ token: newToken, user: { id: user._id, name: user.name, username: user.username, role: user.role, profilePic: user.profilePic } });
+  } catch (err) {
+    res.status(500).json({ message: 'Error updating profile' });
   }
 });
 

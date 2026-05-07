@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api";
 
 const t = {
@@ -35,15 +36,18 @@ const t = {
     saveChanges: "Save Changes",
     updateSuccess: "Profile updated successfully",
     blockSuccess: "Account suspended",
-    unblockSuccess: "Access restored"
+    unblockSuccess: "Access restored",
+    totalMembers: "Total Members",
+    pendingApproval: "Pending Approval"
   },
   am: {
     title: "የአባላት አስተዳደር",
-    pending: "ማንነት ማረጋገጥ",
+    subtitle: "የአባላትን ማንነት ያረጋግጡና ማህበረሰቡን ያስተዳድሩ።",
+    pending: "የማረጋገጫ ጥያቄዎች",
     approved: "የተረጋገጡ አባላት",
-    name: "ስም",
+    name: "ሙሉ ስም",
     username: "የተጠቃሚ ስም",
-    email: "ኢሜይል",
+    email: "ኢሜይል አድራሻ",
     address: "አድራሻ",
     actions: "ድርጊቶች",
     noMembers: "ምንም አባላት አልተገኙም",
@@ -56,7 +60,7 @@ const t = {
     newPassword: "አዲስ ፓስዎርድ",
     passwordResetSuccess: "ለተመረጡት አባላት ፓስዎርድ በተሳካ ሁኔታ ተቀይሯል",
     confirmReset: "ለተመረጡት አባላት ፓስዎርድ መቀየር ትፈልጋለህ?",
-    fullName: "ሙሉ ስም",
+    fullName: "የአባሉ ሙሉ ስም",
     password: "ፓስዎርድ",
     add: "መዝግብ",
     cancel: "ተመለስ",
@@ -65,19 +69,22 @@ const t = {
     unblock: "ከእገዳ አንሳ",
     edit: "መረጃ አርም",
     blocked: "የታገደ",
-    active: "ንቁ",
+    active: "የተረጋገጠ",
     actionsMenu: "የአባል ተግባራት",
     saveChanges: "ማሻሻያውን አስቀምጥ",
     updateSuccess: "መረጃው በተሳካ ሁኔታ ታርሟል",
     blockSuccess: "አካውንቱ ታግዷል",
-    unblockSuccess: "እገዳው ተነስቷል"
+    unblockSuccess: "እገዳው ተነስቷል",
+    totalMembers: "ጠቅላላ አባላት",
+    pendingApproval: "ጥያቄ ላይ ያሉ"
   }
 };
 
 export default function Members({ lang, setLang }) {
+  const navigate = useNavigate();
   const [members, setMembers] = useState([]);
   const [selected, setSelected] = useState([]);
-  const [currentTab, setCurrentTab] = useState("pending");
+  const [currentTab, setCurrentTab] = useState("approved");
   const [msg, setMsg] = useState({ text: "", type: "" });
   const [showAdd, setShowAdd] = useState(false);
   const [addForm, setAddForm] = useState({ name: "", username: "", password: "", email: "", address: "" });
@@ -214,40 +221,52 @@ export default function Members({ lang, setLang }) {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-10 border-b border-slate-200">
-        <div>
-          <h1 className="text-4xl font-outfit font-extrabold text-slate-900 tracking-tight leading-tight">{T.title}</h1>
-          <p className="mt-2 text-slate-500 font-medium">Register new members and verify identity for approval.</p>
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-slate-100 pb-10">
+        <div className="flex items-center gap-6">
+          <button 
+            onClick={() => navigate('/')} 
+            className="w-14 h-14 flex items-center justify-center rounded-[1.2rem] bg-white border border-slate-100 text-slate-400 hover:text-primary hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 group shadow-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 group-hover:-translate-x-1.5 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <div>
+            <h1 className="text-5xl font-outfit font-black text-slate-900 tracking-tight leading-tight mb-2">{T.title}</h1>
+            <p className="text-lg font-medium text-slate-500">{T.subtitle || 'Manage your community'}</p>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-3">
-           <button 
-            className="btn-premium btn-primary-premium shadow-lg shadow-primary/20"
-            onClick={() => { setShowAdd(true); setAddForm({ name: "", username: "", password: "", email: "", address: "" }); }}
-           >
-             <span className="text-lg">➕</span> {T.addMember}
-           </button>
+        
+        <button 
+          onClick={() => { setShowAdd(true); setAddForm({ name: "", username: "", password: "", email: "", address: "" }); }}
+          className="btn-premium btn-primary-premium !h-16 !px-10 shadow-2xl shadow-primary/30 text-lg hover:scale-105 active:scale-95 transition-all duration-300"
+        >
+          ➕ {T.addMember}
+        </button>
+      </div>
+
+      {/* Stats Summary Section */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="card-premium !p-8 flex items-center gap-6 border-l-4 border-l-primary bg-white shadow-xl shadow-slate-200/50">
+           <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-3xl">👥</div>
+           <div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">{T.totalMembers}</p>
+              <p className="text-3xl font-black text-slate-900">{members.length}</p>
+           </div>
+        </div>
+        <div className="card-premium !p-8 flex items-center gap-6 border-l-4 border-l-amber-500 bg-white shadow-xl shadow-slate-200/50">
+           <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center text-3xl">🔍</div>
+           <div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">{T.pendingApproval}</p>
+              <p className="text-3xl font-black text-slate-900">{pendingList.length}</p>
+           </div>
         </div>
       </div>
 
       {/* Tabs & Bulk Actions */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
         <div className="flex bg-slate-100 p-1.5 rounded-2xl w-fit">
-          <button 
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
-              currentTab === "pending" 
-                ? "bg-white text-primary shadow-lg shadow-black/5" 
-                : "text-slate-500 hover:text-slate-700"
-            }`} 
-            onClick={() => changeTab("pending")}
-          >
-            🔍 {T.pending} 
-            <span className={`px-2 py-0.5 rounded-lg text-[10px] font-extrabold ${
-              currentTab === 'pending' ? 'bg-primary/10 text-primary' : 'bg-slate-200 text-slate-500'
-            }`}>
-              {pendingList.length}
-            </span>
-          </button>
           <button 
             className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
               currentTab === "approved" 
@@ -338,11 +357,11 @@ export default function Members({ lang, setLang }) {
                     onChange={() => toggleAll(activeList)} 
                   />
                 </th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">{T.name}</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">{T.username}</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">{T.email}</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">{T.address}</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-right">{T.status}</th>
+                <th className="px-6 py-4 text-xs font-extrabold text-slate-800 uppercase tracking-widest">{T.name}</th>
+                <th className="px-6 py-4 text-xs font-extrabold text-slate-800 uppercase tracking-widest">{T.username}</th>
+                <th className="px-6 py-4 text-xs font-extrabold text-slate-800 uppercase tracking-widest">{T.email}</th>
+                <th className="px-6 py-4 text-xs font-extrabold text-slate-800 uppercase tracking-widest">{T.address}</th>
+                <th className="px-6 py-4 text-xs font-extrabold text-slate-800 uppercase tracking-widest text-right">{T.status}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-sm">

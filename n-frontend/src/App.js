@@ -56,7 +56,45 @@ const Layout = ({ children, lang, setLang }) => {
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(localStorage.getItem("darkMode") === "true");
   const profileRef = useRef(null);
+  const fileInputRef = useRef(null);
   const T = sidebarT[lang];
+
+  const handleProfileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:5000/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      
+      if (res.ok && data.url) {
+        const updateRes = await fetch("http://localhost:5000/api/auth/profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({ profilePic: data.url })
+        });
+        const updateData = await updateRes.json();
+        
+        if (updateRes.ok) {
+          localStorage.setItem("user", JSON.stringify(updateData.user));
+          localStorage.setItem("token", updateData.token);
+          window.location.reload();
+        }
+      }
+    } catch (err) {
+      console.error("Upload failed", err);
+    }
+  };
   
   useEffect(() => {
     const handleOutside = (e) => {
@@ -150,7 +188,11 @@ const Layout = ({ children, lang, setLang }) => {
             ☰
           </button>
           
-          <div className="flex-1" />
+          <div className="flex-1 hidden md:flex items-center gap-3 pl-4 animate-in fade-in slide-in-from-left-4 duration-700">
+            <h4 className="text-[11px] font-black text-primary/80 uppercase tracking-[0.2em] bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20 shadow-sm shadow-primary/5">{T.welcome}</h4>
+            <h1 className="text-xl font-outfit font-extrabold bg-gradient-to-br from-slate-800 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent tracking-tight">{user.name}</h1>
+          </div>
+          <div className="flex-1 md:hidden" />
           
           <div className="flex items-center gap-4">
             <button 
@@ -172,12 +214,12 @@ const Layout = ({ children, lang, setLang }) => {
                 onClick={() => setShowProfile(!showProfile)}
                 className="flex items-center gap-3 p-1.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300"
               >
-                <div className="hidden sm:block text-right px-2">
-                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-none">{user.name}</p>
-                  <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mt-1">{user.role}</p>
-                </div>
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center text-xl shadow-inner border border-white dark:border-slate-700">
-                  👤
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center text-xl shadow-inner border border-white dark:border-slate-700 overflow-hidden">
+                  {user.profilePic ? (
+                    <img src={user.profilePic} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    "👤"
+                  )}
                 </div>
               </button>
 
@@ -186,14 +228,22 @@ const Layout = ({ children, lang, setLang }) => {
                   <div className="px-5 py-3 border-b border-slate-50 dark:border-slate-800 mb-1">
                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">{T.welcome}</p>
                     <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">{user.name}</p>
-                    <p className="text-[10px] font-extrabold text-primary uppercase tracking-wider mt-0.5">{user.role}</p>
+                    <p className="text-[10px] font-extrabold text-primary uppercase tracking-wider mt-0.5">Role: {user.role}</p>
                   </div>
                   <div className="px-4">
+                    <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={handleProfileUpload} />
+                    <button 
+                      onClick={() => fileInputRef.current.click()}
+                      className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-blue-50/50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 font-extrabold text-xs tracking-tight transition-all duration-300 hover:bg-blue-600 hover:text-white shadow-sm hover:shadow-md mb-2 group border border-blue-100/50 dark:border-blue-900/20"
+                    >
+                      <span className="text-lg group-hover:scale-125 transition-transform duration-500">📸</span> 
+                      {lang === 'en' ? 'Change Photo' : 'ፎቶ ቀይር'}
+                    </button>
                     <button 
                       onClick={logout}
-                      className="w-full flex flex-col items-center justify-center gap-2 py-5 rounded-[2rem] bg-rose-50/50 dark:bg-rose-900/10 text-rose-600 dark:text-rose-400 font-extrabold text-sm tracking-tight transition-all duration-300 hover:bg-rose-600 hover:text-white shadow-sm hover:shadow-xl hover:shadow-rose-600/20 group border border-rose-100/50 dark:border-rose-900/20"
+                      className="w-full flex items-center justify-center gap-3 py-3 rounded-2xl bg-rose-50/50 dark:bg-rose-900/10 text-rose-600 dark:text-rose-400 font-extrabold text-sm tracking-tight transition-all duration-300 hover:bg-rose-600 hover:text-white shadow-sm hover:shadow-md group border border-rose-100/50 dark:border-rose-900/20"
                     >
-                      <span className="text-2xl group-hover:scale-125 transition-transform duration-500">🚪</span> 
+                      <span className="text-lg group-hover:scale-125 transition-transform duration-500">🚪</span> 
                       {T.logout}
                     </button>
                   </div>
